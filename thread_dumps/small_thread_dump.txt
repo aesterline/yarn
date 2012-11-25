@@ -1,0 +1,144 @@
+2012-11-25 05:38:05
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode):
+
+"clojure-agent-send-off-pool-5" prio=5 tid=0x00007f809212c000 nid=0x117498000 runnable [0x0000000117495000]
+   java.lang.Thread.State: RUNNABLE
+	at java.net.PlainSocketImpl.socketAccept(Native Method)
+	at java.net.AbstractPlainSocketImpl.accept(AbstractPlainSocketImpl.java:398)
+	at java.net.ServerSocket.implAccept(ServerSocket.java:522)
+	at java.net.ServerSocket.accept(ServerSocket.java:490)
+	at clojure.tools.nrepl.server$accept_connection.invoke(server.clj:34)
+	at clojure.core$binding_conveyor_fn$fn__3989.invoke(core.clj:1822)
+	at clojure.lang.AFn.applyToHelper(AFn.java:161)
+	at clojure.lang.RestFn.applyTo(RestFn.java:132)
+	at clojure.lang.Agent$Action.doRun(Agent.java:116)
+	at clojure.lang.Agent$Action.run(Agent.java:165)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1110)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:603)
+	at java.lang.Thread.run(Thread.java:722)
+
+"clojure-agent-send-off-pool-4" prio=5 tid=0x00007f8090ea7800 nid=0x1170fb000 runnable [0x00000001170fa000]
+   java.lang.Thread.State: RUNNABLE
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.read(SocketInputStream.java:150)
+	at java.net.SocketInputStream.read(SocketInputStream.java:121)
+	at java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:254)
+	- locked <0x00000007f9896030> (a java.io.BufferedInputStream)
+	at java.io.FilterInputStream.read(FilterInputStream.java:83)
+	at java.io.PushbackInputStream.read(PushbackInputStream.java:139)
+	at clojure.tools.nrepl.bencode$read_byte.invokePrim(bencode.clj:88)
+	at clojure.tools.nrepl.bencode$read_token.invoke(bencode.clj:241)
+	at clojure.tools.nrepl.bencode$read_bencode.invoke(bencode.clj:259)
+	at clojure.tools.nrepl.transport$bencode$fn__212.invoke(transport.clj:74)
+	at clojure.tools.nrepl.transport$fn_transport$fn__180.invoke(transport.clj:40)
+	at clojure.core$binding_conveyor_fn$fn__3989.invoke(core.clj:1819)
+	at clojure.lang.AFn.call(AFn.java:18)
+	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:334)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:166)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1110)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:603)
+	at java.lang.Thread.run(Thread.java:722)
+
+"clojure-agent-send-off-pool-3" prio=5 tid=0x00007f8091281800 nid=0x116ccb000 waiting on condition [0x0000000116cca000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x00000007f97e1358> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:226)
+	at java.util.concurrent.SynchronousQueue$TransferStack.awaitFulfill(SynchronousQueue.java:460)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:359)
+	at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:942)
+	at clojure.tools.nrepl.transport$fn_transport$fn__182.invoke(transport.clj:42)
+	at clojure.tools.nrepl.transport.FnTransport.recv(transport.clj:29)
+	at clojure.tools.nrepl.transport.FnTransport.recv(transport.clj:28)
+	at clojure.tools.nrepl.server$handle.invoke(server.clj:26)
+	at clojure.tools.nrepl.server$accept_connection$fn__622.invoke(server.clj:37)
+	at clojure.core$binding_conveyor_fn$fn__3989.invoke(core.clj:1819)
+	at clojure.lang.AFn.call(AFn.java:18)
+	at java.util.concurrent.FutureTask$Sync.innerRun(FutureTask.java:334)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:166)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1110)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:603)
+	at java.lang.Thread.run(Thread.java:722)
+
+"Service Thread" daemon prio=5 tid=0x00007f8092082800 nid=0x116710000 runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C1 CompilerThread2" daemon prio=5 tid=0x00007f8092081800 nid=0x11660d000 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread1" daemon prio=5 tid=0x00007f8092081000 nid=0x11650a000 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread0" daemon prio=5 tid=0x00007f809207f000 nid=0x116407000 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Signal Dispatcher" daemon prio=5 tid=0x00007f809207c000 nid=0x116304000 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Finalizer" daemon prio=5 tid=0x00007f8092055000 nid=0x116009000 in Object.wait() [0x0000000116008000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(Native Method)
+	- waiting on <0x00000007adab0f70> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:135)
+	- locked <0x00000007adab0f70> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:151)
+	at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:177)
+
+"Reference Handler" daemon prio=5 tid=0x00007f8092054800 nid=0x115f06000 in Object.wait() [0x0000000115f05000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(Native Method)
+	- waiting on <0x00000007adab1ef0> (a java.lang.ref.Reference$Lock)
+	at java.lang.Object.wait(Object.java:503)
+	at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:133)
+	- locked <0x00000007adab1ef0> (a java.lang.ref.Reference$Lock)
+
+"main" prio=5 tid=0x00007f8092001000 nid=0x10a9a5000 waiting on condition [0x000000010a9a3000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x00000007f98cdb90> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:186)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(AbstractQueuedSynchronizer.java:834)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.doAcquireSharedInterruptibly(AbstractQueuedSynchronizer.java:994)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1303)
+	at java.util.concurrent.CountDownLatch.await(CountDownLatch.java:236)
+	at clojure.core$promise$reify__6153.deref(core.clj:6292)
+	at clojure.core$deref.invoke(core.clj:2080)
+	at user$eval867.invoke(NO_SOURCE_FILE:1)
+	at clojure.lang.Compiler.eval(Compiler.java:6511)
+	at clojure.lang.Compiler.eval(Compiler.java:6501)
+	at clojure.lang.Compiler.eval(Compiler.java:6477)
+	at clojure.core$eval.invoke(core.clj:2797)
+	at clojure.main$eval_opt.invoke(main.clj:297)
+	at clojure.main$initialize.invoke(main.clj:316)
+	at clojure.main$null_opt.invoke(main.clj:349)
+	at clojure.main$main.doInvoke(main.clj:427)
+	at clojure.lang.RestFn.invoke(RestFn.java:421)
+	at clojure.lang.Var.invoke(Var.java:419)
+	at clojure.lang.AFn.applyToHelper(AFn.java:163)
+	at clojure.lang.Var.applyTo(Var.java:532)
+	at clojure.main.main(main.java:37)
+
+"VM Thread" prio=5 tid=0x00007f8092052000 nid=0x115e03000 runnable
+
+"GC task thread#0 (ParallelGC)" prio=5 tid=0x00007f809200e000 nid=0x1110f9000 runnable
+
+"GC task thread#1 (ParallelGC)" prio=5 tid=0x00007f809200e800 nid=0x1111fc000 runnable
+
+"GC task thread#2 (ParallelGC)" prio=5 tid=0x00007f809200f000 nid=0x1112ff000 runnable
+
+"GC task thread#3 (ParallelGC)" prio=5 tid=0x00007f8092010000 nid=0x111402000 runnable
+
+"VM Periodic Task Thread" prio=5 tid=0x00007f8092063000 nid=0x116813000 waiting on condition
+
+JNI global references: 234
+
+Heap
+ PSYoungGen      total 343744K, used 323475K [0x00000007e4760000, 0x00000007f9fe0000, 0x0000000800000000)
+  eden space 336640K, 94% used [0x00000007e4760000,0x00000007f7c8ef30,0x00000007f9020000)
+  from space 7104K, 96% used [0x00000007f97b0000,0x00000007f9e65f48,0x00000007f9ea0000)
+  to   space 7744K, 0% used [0x00000007f9020000,0x00000007f9020000,0x00000007f97b0000)
+ ParOldGen       total 56384K, used 6973K [0x00000007ad600000, 0x00000007b0d10000, 0x00000007e4760000)
+  object space 56384K, 12% used [0x00000007ad600000,0x00000007adccf7a0,0x00000007b0d10000)
+ PSPermGen       total 21248K, used 15737K [0x00000007a8400000, 0x00000007a98c0000, 0x00000007ad600000)
+  object space 21248K, 74% used [0x00000007a8400000,0x00000007a935e410,0x00000007a98c0000)
