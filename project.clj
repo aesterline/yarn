@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
-                 [parse-ez "0.3.2"]]
+                 [parse-ez "0.3.3"]]
   :profiles {:dev {:resource-paths ["thread_dumps"]}}
   :plugins [[quickie "0.1.0-SNAPSHOT"]]
   :test-matcher #"yarn.*")
