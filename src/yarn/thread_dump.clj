@@ -49,7 +49,8 @@
     (assoc header :elements elements)))
 
 (defn parse-thread-dump [dump-seq]
-  (let [dump (drop-while #(not (re-matches time-re %)) dump-seq)
+  (let [start-dump (drop-while #(not (re-matches time-re %)) dump-seq)
+        dump (take-while #(not (.startsWith % "JNI global references")) start-dump)
         time (first dump)
         version (s/replace (second dump) #":" "")
         stacks (remove #(s/blank? (first %)) (partition-by s/blank? (nnext dump)))]

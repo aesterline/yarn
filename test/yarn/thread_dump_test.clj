@@ -158,6 +158,8 @@ Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode):
 \"VM Thread\" prio=5 tid=0x00007f8092052000 nid=0x115e03000 runnable
 
 \"GC task thread#0 (ParallelGC)\" prio=5 tid=0x00007f809200e000 nid=0x1110f9000 runnable
+
+JNI global references: 234
 ")
 
 (deftest thread-dump-small
