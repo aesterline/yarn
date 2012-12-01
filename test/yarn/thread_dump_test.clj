@@ -163,8 +163,8 @@ JNI global references: 234
 ")
 
 (deftest thread-dump-small
-  (let [dump (t/parse-thread-dump (line-seq (BufferedReader. (StringReader. small-thread-dump))))]
-    (is (= {:timestamp "2012-11-25 05:38:05"
+  (let [dump (t/parse-thread-dump-file (StringReader. small-thread-dump))]
+    (is (= [{:timestamp "2012-11-25 05:38:05"
             :version "Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode)"
             :threads [{:name "VM Thread"
                        :type :task
@@ -181,4 +181,4 @@ JNI global references: 234
                        :native-id "0x1110f9000"
                        :state "runnable"
                        :address nil
-                       :elements []}]} dump))))
+                       :elements []}]}] dump))))

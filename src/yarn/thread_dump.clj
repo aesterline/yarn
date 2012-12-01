@@ -48,16 +48,22 @@
         elements (parse-trace-elements (nnext trace))]
     (assoc header :elements elements)))
 
-(defn parse-thread-dump [dump-seq]
-  (let [start-dump (drop-while #(not (re-matches time-re %)) dump-seq)
-        dump (take-while #(not (.startsWith % "JNI global references")) start-dump)
-        time (first dump)
+(defn parse-thread-dump [dump]
+  (let [time (first dump)
         version (s/replace (second dump) #":" "")
         stacks (remove #(s/blank? (first %)) (partition-by s/blank? (nnext dump)))]
     {:timestamp time
      :version version
      :threads (reduce #(conj %1 (parse-stack-trace %2)) [] stacks)}))
 
-(defn parse-thread-dump-file [filename]
-  (with-open [rdr (clojure.java.io/reader filename)]
-    (parse-thread-dump (line-seq rdr))))
+(defn next-dump [lines]
+  (let [start-dump (drop-while #(not (re-matches time-re %)) lines)]
+    (split-with #(not (.startsWith % "JNI global references")) start-dump)))
+
+(defn parse-thread-dump-file [file]
+  (with-open [rdr (clojure.java.io/reader file)]
+    (loop [dumps []
+           [dump rest] (next-dump (line-seq rdr))]
+      (if (empty? dump)
+        dumps
+        (recur (conj dumps (parse-thread-dump dump)) (next-dump rest))))))
