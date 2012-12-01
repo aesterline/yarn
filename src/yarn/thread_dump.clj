@@ -1,29 +1,23 @@
 (ns yarn.thread-dump
-  (:require [protoflex.parse :as p]
-            [clojure.string :as s]))
+  (:require [clojure.string :as s]))
 
-(defn thread-address []
-  (p/sq-brackets #(p/regex #"\w+")))
+(def header-regex #"^\"(.+?)\"\s*(daemon)?\s*prio=(\d+) tid=(\S+) nid=(\S+) ([^\[]+)\[?(.+?)?\]?$")
+(def element-regex #"^\s+at ([^\(]+)\((.+?)\)$")
+(def monitor-regex #"^\s+- ([^<]+)<([^>]+)> \(a ([^\)]+)\)$")
+(def time-re #"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}")
 
-(defn thread-header []
-  (let [name (p/regex #"\"(.+?)\"" 1)
-        type (keyword (p/opt #(p/string "daemon") "task"))
-        priority (do (p/string "prio=") (p/integer))
-        thread-id (p/regex #"tid=(\S+)" 1)
-        native-id (p/regex #"nid=(\S+)" 1)
-        state (p/read-to-re #" \[|\r?\n")
-        address (p/attempt thread-address)]
+(defn parse-thread-header [header]
+  (let [[_ name type priority thread-id native-id state address] (re-find header-regex header)]
     {:name name
-     :type type
-     :priority priority
+     :type (if type :daemon :task)
+     :priority (Integer/parseInt priority)
      :thread-id thread-id
      :native-id native-id
-     :state state
+     :state (s/trim state)
      :address address}))
 
-(defn stack-trace-element []
-  (let [method (do (p/skip-over "at") (p/read-to "("))
-        location (p/regex #"\((.+?)\)" 1)
+(defn parse-stack-trace-element [element]
+  (let [[_ method location] (re-find element-regex element)
         [file line-number] (s/split location #":")]
     {:method method
      :file file
@@ -35,37 +29,34 @@
     (.startsWith text "locked") :locked
     (.startsWith text "parking") :parked))
 
-(defn monitor []
-  (let [state-str (do (p/skip-over "-") (p/read-to "<"))
-        monitor (p/regex #"<(.+?)>" 1)
-        lock (p/regex #"\(a (.+?)\)" 1)]
+(defn parse-monitor [text]
+  (let [[_ state-str monitor lock] (re-find monitor-regex text)]
     {:state (state state-str)
      :monitor monitor
      :lock lock}))
 
-(defn trace-elements []
-  (p/look-ahead ["at" stack-trace-element
-                 "-" monitor]))
+(defn element->data [element]
+  (cond
+    (re-matches element-regex element) (parse-stack-trace-element element)
+    (re-matches monitor-regex element) (parse-monitor element)))
 
-(defn stack-trace []
-  (let [header (thread-header)
-        thread-state (p/attempt #(p/skip-over-re #"java.lang.Thread.State:.+?\r?\n"))
-        elements (p/opt #(p/multi+ trace-elements) [])]
+(defn parse-trace-elements [elements]
+  (reduce #(conj %1 (element->data %2)) [] elements))
+
+(defn parse-stack-trace [trace]
+  (let [header (parse-thread-header (first trace))
+        elements (parse-trace-elements (nnext trace))]
     (assoc header :elements elements)))
 
-;2012-11-25 05:38:05
-(defn timestamp []
-  (let [time-re #"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"]
-    (p/read-to-re time-re)
-    (p/regex time-re)))
-
-(defn thread-dump []
-  (let [time (timestamp)
-        version (p/regex #"(.+?):\r?\n" 1)
-        threads (p/multi+ stack-trace)]
+(defn parse-thread-dump [dump-seq]
+  (let [dump (drop-while #(not (re-matches time-re %)) dump-seq)
+        time (first dump)
+        version (s/replace (second dump) #":" "")
+        stacks (remove #(s/blank? (first %)) (partition-by s/blank? (nnext dump)))]
     {:timestamp time
      :version version
-     :threads threads}))
+     :threads (reduce #(conj %1 (parse-stack-trace %2)) [] stacks)}))
 
-(defn parse-thread-dump [dump]
-  (p/parse thread-dump dump :eof false))
+(defn parse-thread-dump-file [filename]
+  (with-open [rdr (clojure.java.io/reader filename)]
+    (parse-thread-dump (line-seq rdr))))

@@ -1,14 +1,14 @@
 (ns yarn.thread-dump-test
-  (:require [yarn.thread-dump :as t]
-            [protoflex.parse :as p])
-  (:use clojure.test))
+  (:require [yarn.thread-dump :as t])
+  (:use clojure.test)
+  (:import [java.io BufferedReader StringReader]))
 
 (def gc-header "\"GC task thread#0 (ParallelGC)\" prio=5 tid=0x00007f809200e000 nid=0x1110f9000 runnable\n")
 (def task-header "\"main\" prio=5 tid=0x00007f8092001000 nid=0x10a9a5000 waiting on condition [0x000000010a9a3000]\n")
 (def daemon-header "\"Reference Handler\" daemon prio=5 tid=0x00007f8092054800 nid=0x115f06000 in Object.wait() [0x0000000115f05000]\n")
 
 (deftest gc-thread-header
-  (let [header (p/parse t/thread-header gc-header :eof false)]
+  (let [header (t/parse-thread-header gc-header)]
     (is (= "GC task thread#0 (ParallelGC)" (:name header)))
     (is (= :task (:type header)))
     (is (= 5 (:priority header)))
@@ -17,7 +17,7 @@
     (is (= "runnable" (:state header)))))
 
 (deftest task-thread-header
-  (let [header (p/parse t/thread-header task-header :eof false)]
+  (let [header (t/parse-thread-header task-header)]
     (is (= "main" (:name header)))
     (is (= :task (:type header)))
     (is (= 5 (:priority header)))
@@ -27,7 +27,7 @@
     (is (= "0x000000010a9a3000" (:address header)))))
 
 (deftest daemon-thread-header
-  (let [header (p/parse t/thread-header daemon-header :eof false)]
+  (let [header (t/parse-thread-header daemon-header)]
     (is (= "Reference Handler" (:name header)))
     (is (= :daemon (:type header)))
     (is (= 5 (:priority header)))
@@ -40,13 +40,13 @@
 (def regular-method-element "	at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:133)\n")
 
 (deftest native-stack-trace-element
-  (let [element (p/parse t/stack-trace-element native-method-element :eof false)]
+  (let [element (t/parse-stack-trace-element native-method-element)]
     (is (= "java.lang.Object.wait" (:method element)))
     (is (= "Native Method" (:file element)))
     (is (= -1 (:line-number element)))))
 
 (deftest regular-stack-trace-element
-  (let [element (p/parse t/stack-trace-element regular-method-element :eof false)]
+  (let [element (t/parse-stack-trace-element regular-method-element)]
     (is (= "java.lang.ref.Reference$ReferenceHandler.run" (:method element)))
     (is (= "Reference.java" (:file element)))
     (is (= 133 (:line-number element)))))
@@ -56,19 +56,19 @@
 (def locked-monitor "  - locked <0x00000007f9896030> (a java.io.BufferedInputStream)")
 
 (deftest waiting-stack-monitor
-  (let [monitor (p/parse t/monitor waiting-monitor :eof false)]
+  (let [monitor (t/parse-monitor waiting-monitor)]
     (is (= :waiting (:state monitor)))
     (is (= "0x00000007adab0f70" (:monitor monitor)))
     (is (= "java.lang.ref.ReferenceQueue$Lock" (:lock monitor)))))
 
 (deftest locked-stack-monitor
-  (let [monitor (p/parse t/monitor locked-monitor :eof false)]
+  (let [monitor (t/parse-monitor locked-monitor)]
     (is (= :locked (:state monitor)))
     (is (= "0x00000007f9896030" (:monitor monitor)))
     (is (= "java.io.BufferedInputStream" (:lock monitor)))))
 
 (deftest parked-stack-monitor
-  (let [monitor (p/parse t/monitor parked-monitor :eof false)]
+  (let [monitor (t/parse-monitor parked-monitor)]
     (is (= :parked (:state monitor)))
     (is (= "0x00000007f97e1358" (:monitor monitor)))
     (is (= "java.util.concurrent.SynchronousQueue$TransferStack" (:lock monitor)))))
@@ -92,7 +92,7 @@
   - locked <0x00000007adab0f70> (a java.lang.ref.ReferenceQueue$Lock)")
 
 (deftest gc-stack-trace
-  (let [trace (p/parse t/stack-trace gc-header :eof false)]
+  (let [trace (t/parse-stack-trace (line-seq (BufferedReader. (StringReader. gc-header))))]
     (is (= {:name "GC task thread#0 (ParallelGC)"
             :type :task
             :priority 5
@@ -103,7 +103,7 @@
             :elements []} trace))))
 
 (deftest daemon-stack-trace
-  (let [trace (p/parse t/stack-trace daemon-thread :eof false)]
+  (let [trace (t/parse-stack-trace (line-seq (BufferedReader. (StringReader. daemon-thread))))]
     (is (= {:name "Service Thread"
             :type :daemon
             :priority 5
@@ -114,7 +114,7 @@
             :elements []} trace))))
 
 (deftest no-monitor-trace
-  (let [trace (p/parse t/stack-trace no-monitor-thread :eof false)]
+  (let [trace (t/parse-stack-trace (line-seq (BufferedReader. (StringReader. no-monitor-thread))))]
     (is (= {:name "clojure-agent-send-off-pool-5"
             :type :task
             :priority 5
@@ -130,7 +130,7 @@
                         :line-number 722}]} trace))))
 
 (deftest monitor-trace
-  (let [trace (p/parse t/stack-trace monitor-thread :eof false)]
+  (let [trace (t/parse-stack-trace (line-seq (BufferedReader. (StringReader. monitor-thread))))]
     (is (= {:name "Finalizer"
             :type :daemon
             :priority 5
@@ -152,16 +152,16 @@
                         :lock "java.lang.ref.ReferenceQueue$Lock"}]} trace))))
 
 (def small-thread-dump
-  "2012-11-25 05:38:05
-  Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode):
+"2012-11-25 05:38:05
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode):
 
-  \"VM Thread\" prio=5 tid=0x00007f8092052000 nid=0x115e03000 runnable
+\"VM Thread\" prio=5 tid=0x00007f8092052000 nid=0x115e03000 runnable
 
-  \"GC task thread#0 (ParallelGC)\" prio=5 tid=0x00007f809200e000 nid=0x1110f9000 runnable
-  ")
+\"GC task thread#0 (ParallelGC)\" prio=5 tid=0x00007f809200e000 nid=0x1110f9000 runnable
+")
 
 (deftest thread-dump-small
-  (let [dump (p/parse t/thread-dump small-thread-dump)]
+  (let [dump (t/parse-thread-dump (line-seq (BufferedReader. (StringReader. small-thread-dump))))]
     (is (= {:timestamp "2012-11-25 05:38:05"
             :version "Full thread dump Java HotSpot(TM) 64-Bit Server VM (23.0-b17 mixed mode)"
             :threads [{:name "VM Thread"
