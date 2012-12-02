@@ -3,12 +3,14 @@
 yarn is a JVM thread dump parser written in Clojure. yarn's main goal is to turn JVM thread dumps
 into Clojure data.
 
+[![Build Status](https://secure.travis-ci.org/aesterline/yarn.png)](http://travis-ci.org/aesterline/yarn)
+
 ## Installation
 
 `yarn` is available as a Maven artifact from [Clojars](http://clojars.org/yarn):
 
 ```clojure
-[yarn "0.0.1]
+[yarn "0.0.1"]
 ```
 
 ## Usage
