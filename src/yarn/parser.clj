@@ -1,4 +1,4 @@
-(ns yarn.thread-dump
+(ns yarn.parser
   (:require [clojure.string :as s]))
 
 (def header-regex #"^\"(.+?)\"\s*(daemon)?\s*prio=(\d+) tid=(\S+) nid=(\S+) ([^\[]+)\[?(.+?)?\]?$")

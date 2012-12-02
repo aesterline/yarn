@@ -1,5 +1,5 @@
-(ns yarn.thread-dump-test
-  (:require [yarn.thread-dump :as t])
+(ns yarn.paser-test
+  (:require [yarn.parser :as t])
   (:use clojure.test)
   (:import [java.io BufferedReader StringReader]))
 
